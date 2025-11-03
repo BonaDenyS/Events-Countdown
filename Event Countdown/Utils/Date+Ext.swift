@@ -8,9 +8,9 @@
 import Foundation
 
 extension Date {
-    func relativeDate() -> String {
+    func relativeDate(_ now: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .full
-        return formatter.localizedString(for: self, relativeTo: Date())
+        return formatter.localizedString(for: self, relativeTo: now)
     }
 }

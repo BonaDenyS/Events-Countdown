@@ -9,14 +9,16 @@ import SwiftUI
 
 struct EventRow: View {
     let event: Event
-
+    @State private var now = Date()
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(event.title)
                     .font(.headline)
                     .foregroundColor(event.textColor)
-                Text(event.date.relativeDate())
+                Text(event.date.relativeDate(now))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -26,5 +28,8 @@ struct EventRow: View {
                 .imageScale(.small)
         }
         .padding(.vertical, 6)
+        .onReceive(timer) { time in
+            now = time
+        }
     }
 }
