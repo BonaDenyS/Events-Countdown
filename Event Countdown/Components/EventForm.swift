@@ -9,8 +9,8 @@ import SwiftUI
 
 struct EventForm: View {
     @Environment(\.dismiss) var dismiss
-    @Binding var events: [Event]
     var editingEvent: Event? = nil
+    var onSave: (Event) -> Void
 
     @State private var title = ""
     @State private var date = Date()
@@ -26,7 +26,8 @@ struct EventForm: View {
                 ColorPicker("Text Color", selection: $textColor)
             }
         }
-        .navigationTitle(editingEvent == nil ? "Add Event" : "Edit Event")
+        .navigationTitle(editingEvent == nil ? "Add Event" : "Edit \(title)")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button {
@@ -48,13 +49,12 @@ struct EventForm: View {
     }
 
     private func saveEvent() {
-        if let editingEvent = editingEvent,
-           let index = events.firstIndex(where: { $0.id == editingEvent.id }) {
-            events[index] = Event(id: editingEvent.id, title: title, date: date, textColor: textColor)
-        } else {
-            let newEvent = Event(id: UUID(), title: title, date: date, textColor: textColor)
-            events.append(newEvent)
-        }
-        events.sort()
+        let event = Event(
+            id: editingEvent?.id ?? UUID(),
+            title: title,
+            date: date,
+            textColor: textColor
+        )
+        onSave(event)
     }
 }

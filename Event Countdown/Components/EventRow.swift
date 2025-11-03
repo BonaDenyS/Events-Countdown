@@ -16,7 +16,7 @@ struct EventRow: View {
                 Text(event.title)
                     .font(.headline)
                     .foregroundColor(event.textColor)
-                Text(event.date.relativeDescription())
+                Text(event.date.relativeDate())
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }

@@ -9,45 +9,47 @@ import SwiftUI
 
 struct EventsView: View {
     @State private var events: [Event] = []
-    @State private var showingAddEvent = false
-    @State private var editingEvent: Event? = nil
-
+    @State private var selectedEvent: Event?
+    @State private var showingAddForm = false
+    
     var body: some View {
         NavigationStack {
             List {
                 ForEach(events.sorted()) { event in
-                    Button {
-                        editingEvent = event
-                    } label: {
-                        EventRow(event: event)
-                    }
+                    EventRow(event: event)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            selectedEvent = event
+                        }
                 }
-                .onDelete(perform: deleteEvent)
+                .onDelete { indexSet in
+                    events.remove(atOffsets: indexSet)
+                }
             }
             .navigationTitle("Events")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        showingAddEvent = true
+                        showingAddForm = true
                     } label: {
                         Image(systemName: "plus")
                     }
                 }
             }
-            .sheet(isPresented: $showingAddEvent) {
-                NavigationStack {
-                    EventForm(events: $events)
+            .navigationDestination(isPresented: $showingAddForm) {
+                EventForm { newEvent in
+                    events.append(newEvent)
+                    events.sort()
                 }
             }
-            .sheet(item: $editingEvent) { event in
-                NavigationStack {
-                    EventForm(events: $events, editingEvent: event)
+            .navigationDestination(item: $selectedEvent) { event in
+                EventForm(editingEvent: event) { updatedEvent in
+                    if let index = events.firstIndex(where: { $0.id == updatedEvent.id }) {
+                        events[index] = updatedEvent
+                        events.sort()
+                    }
                 }
             }
         }
-    }
-
-    private func deleteEvent(at offsets: IndexSet) {
-        events.remove(atOffsets: offsets)
     }
 }
